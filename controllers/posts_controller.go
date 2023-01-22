@@ -1,5 +1,6 @@
 package controllers
 
+
 import (
 	"marcellinuselbert-be/initializers"
 	"marcellinuselbert-be/models"
@@ -49,6 +50,54 @@ func PostsFetchById(c *gin.Context) {
 
 	var post models.Post
 	initializers.DB.First(&post, id)
+	c.JSON(200, gin.H{
+		"posts": post,
+	})
+}
+
+func PostsUpdateById(c *gin.Context) {
+
+	id := c.Param("id")
+
+	var body struct {
+		Body  string
+		Title string
+	}
+	c.Bind(&body)
+
+	if body.Title == "" && body.Body == "" {
+		c.JSON(200, gin.H{
+			"message": "No args",
+		})
+		return
+	}
+
+	var post models.Post
+
+	initializers.DB.First(&post, id)
+
+	initializers.DB.Model(&post).Updates(models.Post{
+		Title: body.Title,
+		Body:  body.Body,
+	})
+
+	c.JSON(200, gin.H{
+		"posts": post,
+	})
+}
+
+
+
+func PostsDeleteById(c *gin.Context) {
+
+	id := c.Param("id")
+
+
+	var post models.Post
+
+
+	initializers.DB.Delete(&post,id)
+
 	c.JSON(200, gin.H{
 		"posts": post,
 	})
